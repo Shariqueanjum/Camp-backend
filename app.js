@@ -1,5 +1,4 @@
-
-     require('dotenv').config();
+require('dotenv').config();
 
 
 const express=require("express");
@@ -22,8 +21,11 @@ const CampgroundRouter=require('./routes/campgrounds.js');
 const ReviewRouter=require('./routes/reviews.js');
 const UserRouter=require('./routes/users.js');
 
+const MongoDBStore = require("connect-mongo")(session);
 
-mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
+const dbUrl=process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp';
+
+mongoose.connect(dbUrl)
 .then(()=>{
     console.log("Mongoose setup is done");
 })
@@ -48,8 +50,20 @@ app.use(mongoSanitize({
 }))
 
 
+const store = new MongoDBStore({
+    url: dbUrl,
+    secret:'thisshouldbeabettersecret',
+    touchAfter: 24 * 60 * 60
+});
+
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR", e)
+})
+
+
 
 const sessionConfig={
+    store,
     name:'session',
     secret:'thisshouldbeabettersecret!',
     resave: false,
