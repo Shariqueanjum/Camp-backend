@@ -98,13 +98,13 @@ catch(e){
 };
 
 module.exports.deleteCampground=async (req,res,next)=>{
-   try{
+try{
  const{id}=req.params;
 await Campground.findByIdAndDelete(id);
 res.redirect('/campgrounds');
    }
-   catch(e){
-       next(e);
+catch(e){
+    next(e);
    }
 
 
